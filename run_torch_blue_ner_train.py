@@ -15,6 +15,7 @@ flags.do_predict=False
 flags.task_name="bc5cdr"
 # bert_config is supplied by huggingface
 # init_checkpoint is supplied by huggingface
+flags.learning_rate=5e-5
 flags.num_train_epochs=10
 flags.data_dir=adirDataset
 flags.output_dir=adirOutput

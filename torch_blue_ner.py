@@ -395,7 +395,7 @@ def train(device, dataloader, model, loss_fn, optimizer):
             print(f"batch: {batch} loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 def test(device, dataloader, model, loss_fn):
-    size = len(dataloader.dataset)
+    size = 0
     num_batches = len(dataloader)
     model.eval()
     test_loss, correct = 0, 0
@@ -416,10 +416,11 @@ def test(device, dataloader, model, loss_fn):
             # pred.shape=torch.Size([32, 128, 7]) y.shape=torch.Size([32, 1, 128])
             s = eval_fn(pred,y)
             #print("score.shape={} score={}".format(s.shape, s))
-            correct += s.type(torch.float).sum().item()
+            correct += s.sum().item()
+            size += input_mask.count_nonzero().item()
     test_loss /= num_batches
-    correct /= size
-    print(f"Test set: Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}")
+    acc = correct / size
+    print(f"Test set: Accuracy: {(100*acc):>0.1f}%, {correct} of {size}, Avg loss: {test_loss:>8f}")
 
 def run_main(flags):
     # TODO?: interpret directory relative to script

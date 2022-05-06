@@ -24,7 +24,7 @@ class Flags():
         self.do_eval=False
         self.do_predict=True
         self.do_checkpoint=True
-        self.do_print_sentences=False
+        self.do_print_sentences=True
         self.train_batch_size=32
         self.eval_batch_size=8
         self.predict_batch_size=8
@@ -397,7 +397,7 @@ def train(device, dataloader, model, loss_fn, optimizer):
             print(f"batch: {batch} loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 def is_sentence_interesting(iSentence):
-    return True
+    return iSentence in [568, 633, 650]
 
 def print_sentence(tokenizer, iSentence, input_ids_0, input_mask_0, y0, yhat0, s0):
     for i in range(0,128):

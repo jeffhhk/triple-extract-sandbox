@@ -173,6 +173,8 @@ class BC5CDRProcessor(DataProcessor):
             examples.append(InputExample(guid=guid, text=text, label=label))
         return examples
 
+def label_permute_debug(label):
+    return label
 
 def convert_single_example(ex_index, example, label_list, max_seq_length, tokenizer, output_dir):
     label_map = {}
@@ -210,7 +212,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
     for i, token in enumerate(tokens):
         ntokens.append(token)
         segment_ids.append(0)
-        label_ids.append(label_map[labels[i]])
+        label_ids.append(label_permute_debug(label_map[labels[i]]))
     ntokens.append("[SEP]")
     segment_ids.append(0)
     # append("O") or append("[SEP]") not sure!

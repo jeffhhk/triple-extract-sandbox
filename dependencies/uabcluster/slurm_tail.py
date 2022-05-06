@@ -20,16 +20,18 @@ fn=sys.argv[2]
 file = open(fn)
 fcntl.fcntl(file, fcntl.F_SETFL, os.O_RDONLY|os.O_NONBLOCK)
 
-doContinue=True
+cMorePolls = 3
 print("about to monitor {}".format(fn))
 sys.stdout.flush()
-while doContinue:
+while cMorePolls>0:
     iOffset = file.tell()
     line = file.readline()
     if not line:
         time.sleep(1)
         file.seek(iOffset)
-        doContinue=isRunning(jobid)
+        if isRunning(jobid):
+            cMorePolls = 3
+        cMorePolls -= 1
     else:
         line=line.rstrip("\n")
         print(line)

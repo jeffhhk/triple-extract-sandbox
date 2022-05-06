@@ -1,5 +1,5 @@
 #!/bin/bash
-adirRepo=$( cd $( dirname "$0" ) && pwd )
+adirRepo=$( cd $( dirname "$0" ) && cd .. && pwd )
 
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail

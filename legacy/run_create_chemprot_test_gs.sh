@@ -1,5 +1,5 @@
 #!/bin/bash
-adirRepo=$( cd $( dirname "$0" ) && pwd )
+adirRepo=$( cd $( dirname "$0" ) && cd .. && pwd )
 
 cd "$adirRepo"/BLUE_Benchmark
 python blue/gs/create_chemprot_test_gs.py \

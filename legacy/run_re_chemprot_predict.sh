@@ -1,5 +1,5 @@
 #!/bin/bash
-adirRepo=$( cd $( dirname "$0" ) && pwd )
+adirRepo=$( cd $( dirname "$0" ) && cd .. && pwd )
 
 # Synopsis: test RE model using run_bluebert.py using ChemProt data from BioCreative VI
 #

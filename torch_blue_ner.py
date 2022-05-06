@@ -174,6 +174,10 @@ class BC5CDRProcessor(DataProcessor):
         return examples
 
 def label_permute_debug(label):
+    # if label==1:
+    #     return 4
+    # if label<=4:
+    #     return label-1
     return label
 
 def convert_single_example(ex_index, example, label_list, max_seq_length, tokenizer, output_dir):

@@ -180,8 +180,9 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
         label_map[label] = i
     os.makedirs(output_dir, exist_ok=True)
     label2id_file = os.path.join(output_dir, 'label2id.pkl')
-    with open(label2id_file, "wb") as w:
-        pickle.dump(label_map, w)
+    if not os.path.exists(label2id_file):
+        with open(label2id_file, "wb") as w:
+            pickle.dump(label_map, w)
     textlist = example.text.split(' ')
     labellist = example.label.split(' ')
     tokens = []

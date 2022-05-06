@@ -24,6 +24,7 @@ class Flags():
         self.do_eval=False
         self.do_predict=True
         self.do_checkpoint=True
+        self.do_print_sentences=False
         self.train_batch_size=32
         self.eval_batch_size=8
         self.predict_batch_size=8
@@ -395,13 +396,32 @@ def train(device, dataloader, model, loss_fn, optimizer):
             loss, current = loss.item(), batch
             print(f"batch: {batch} loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
-def test(device, dataloader, model, loss_fn):
+def is_sentence_interesting(iSentence):
+    return True
+
+def print_sentence(tokenizer, iSentence, input_ids_0, input_mask_0, y0, yhat0, s0):
+    for i in range(0,128):
+        if input_mask_0[i]>0:
+            tokid = input_ids_0[i]
+            w = tokenizer.convert_ids_to_tokens([tokid])
+            print("\t".join([str(iSentence), w[0], str(y0[i].item()), str(yhat0[i].item()), str(s0[i].item()) ])) #, str(yhat0[i].item()), str(s[i].item())]))
+
+def print_sentences(tokenizer, iBatch, X, y,yhat, s):
+    batch_size = X.size()[0]
+    for j in range(0,batch_size):
+        iSentence = iBatch*batch_size + j
+        if is_sentence_interesting(iSentence):
+            input_ids = torch.select(X, 1, 0)
+            input_mask = torch.select(X, 1, 1)
+            print_sentence(tokenizer, iSentence, input_ids[j], input_mask[j], torch.select(y,0,j), torch.select(yhat,0,j), torch.select(s,0,j))
+
+def test(flags, tokenizer, device, dataloader, model, loss_fn):
     size = 0
     num_batches = len(dataloader)
     model.eval()
     test_loss, correct = 0, 0
     with torch.no_grad():
-        for batch, (X, y) in enumerate(dataloader):
+        for iBatch, (X, y) in enumerate(dataloader):
             X, y = X.to(device), y.to(device)
             input_ids = torch.select(X, 1, 0)
             input_mask = torch.select(X, 1, 1)
@@ -416,6 +436,9 @@ def test(device, dataloader, model, loss_fn):
             #print("pred.shape={} y.shape={}".format(pred.shape, y.shape))
             # pred.shape=torch.Size([32, 128, 7]) y.shape=torch.Size([32, 1, 128])
             s = eval_fn(pred,y)
+            yhat = pred.argmax(2)
+            if flags.do_print_sentences:
+                print_sentences(tokenizer, iBatch, X, y, yhat, s)
             #print("score.shape={} score={}".format(s.shape, s))
             correct += (s * input_mask).count_nonzero().item()
             size += input_mask.count_nonzero().item()
@@ -480,11 +503,11 @@ def run_main(flags):
         dldr_train=DataLoader(
             NerIterableDataset(train_examples, label_list, flags.max_seq_length, tokenizer, flags.output_dir),
             batch_size=flags.train_batch_size, num_workers=0) # single process
-        test(device, dldr_test, nermodel, loss_fn)
+        test(flags, tokenizer, device, dldr_test, nermodel, loss_fn)
         for t in range(flags.num_train_epochs):
             print(f"Epoch {t+1}\n-------------------------------")
             train(device, dldr_train, nermodel, loss_fn, optimizer)
-            test(device, dldr_test, nermodel, loss_fn)
+            test(flags, tokenizer, device, dldr_test, nermodel, loss_fn)
             if flags.do_checkpoint:
                 torch.save({
                             # 'epoch': epoch,
@@ -495,7 +518,7 @@ def run_main(flags):
                 print("Saved PyTorch Model State to {}".format(flags.basename_model))
 
     if flags.do_eval:
-        test(device, dldr_test, nermodel, loss_fn)
+        test(flags, tokenizer, device, dldr_test, nermodel, loss_fn)
     if flags.do_predict:
         # TODO
         with open(os.path.join(flags.output_dir, 'label2id.pkl'), 'rb') as rf:

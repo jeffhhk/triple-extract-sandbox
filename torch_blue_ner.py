@@ -202,6 +202,12 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
                 labels.append(label_1)
             else:
                 labels.append("X")
+                # if label_1=="O":
+                #     labels.append("O")
+                # elif label_1=="B" or label_1=="I":
+                #     labels.append("I")
+                # else:
+                #     labels.append("X")
     # tokens = tokenizer.tokenize(example.text)
     if len(tokens) >= max_seq_length - 1:
         tokens = tokens[0:(max_seq_length - 2)]

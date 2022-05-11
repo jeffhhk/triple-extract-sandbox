@@ -314,9 +314,10 @@ class NerModel(nn.Module):
         self.model0 = AutoModel.from_config(self.bert_config)
         self.model0.to(device)
 
-        self.encoder = list(self.model0.modules())[-5]
+        iLastEncoder=-5
+        self.encoder = list(self.model0.modules())[iLastEncoder]
         self.encoder_parameters = [p
-                                   for m in list(self.model0.modules())[0:-4]
+                                   for m in list(self.model0.modules())[0:iLastEncoder+1]
                                    for p in m.parameters()]
 
         self.encoder_out = None

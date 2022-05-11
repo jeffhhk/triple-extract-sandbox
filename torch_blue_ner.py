@@ -306,9 +306,9 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 
 def create_loss_fn(num_classes):
     def fn(logits,y):
-        log_probs=nn.Softmax(dim=-1)(logits)
+        log_probs=nn.functional.log_softmax(logits, dim=-1)
         one_hot_labels = nn.functional.one_hot(y, num_classes=(num_classes+1))
-        per_example_loss = (one_hot_labels * log_probs).sum(dim=-1)
+        per_example_loss = -(one_hot_labels * log_probs).sum(dim=-1)
         total_loss = per_example_loss.sum()
         return (per_example_loss, total_loss)
     return fn

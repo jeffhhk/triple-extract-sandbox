@@ -25,6 +25,7 @@ then
     scancel $jobs
 fi
 
+echo Requesting job on ${SBATCH_PARTITION}
 # This version of sbatch seems to not respect SLURM_MEM_PER_CPU, so we pass it explicitly.
 resp=$(cd "$adirScript"; sbatch --parsable --mem-per-cpu=${SLURM_MEM_PER_CPU} --output="$adirLog"/slurm-%A_0.out --error="$adirLog"/slurm-%A_0.out -- "$@")
 jobid=$(printf "%s" ${resp} | cut -d: -f2)

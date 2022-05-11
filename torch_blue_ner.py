@@ -391,7 +391,7 @@ def train(device, dataloader, model, loss_fn, optimizer):
         optimizer.step()
 
         if batch % 10 == 0:
-            loss, current = loss.item(), batch * len(X)
+            loss, current = loss.item(), batch
             print(f"batch: {batch} loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 def test(device, dataloader, model, loss_fn):

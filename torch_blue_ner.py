@@ -416,7 +416,7 @@ def test(device, dataloader, model, loss_fn):
             # pred.shape=torch.Size([32, 128, 7]) y.shape=torch.Size([32, 1, 128])
             s = eval_fn(pred,y)
             #print("score.shape={} score={}".format(s.shape, s))
-            correct += s.count_nonzero().item()
+            correct += (s * input_mask).count_nonzero().item()
             size += input_mask.count_nonzero().item()
     test_loss /= num_batches
     acc = correct / size

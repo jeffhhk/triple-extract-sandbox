@@ -305,10 +305,10 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
 # JH: no need to decode a TFRecord file in the current implementation.
 
 def create_loss_fn(num_classes):
-    def fn(logits,y):
+    def fn(logits,y,mask):
         log_probs=nn.functional.log_softmax(logits, dim=-1)
         one_hot_labels = nn.functional.one_hot(y, num_classes=(num_classes+1))
-        per_example_loss = -(one_hot_labels * log_probs).sum(dim=-1)
+        per_example_loss = -(one_hot_labels * log_probs).sum(dim=-1) * mask
         total_loss = per_example_loss.sum()
         return (per_example_loss, total_loss)
     return fn
@@ -396,7 +396,7 @@ def train(device, dataloader, model, loss_fn, optimizer):
         t0=time.time()
         pred = model.forward(input_ids, attention_mask=input_mask, segment_ids=segment_ids)
         #print("dt={}".format(time.time()-t0))
-        (per_example_loss, loss) = loss_fn(pred, y)
+        (per_example_loss, loss) = loss_fn(pred, y, input_mask)
         #print("pred.shape={} y.shape={}".format(pred.shape, y.shape))
         #pred.shape=torch.Size([32, 128, 7]) y.shape=torch.Size([32, 1, 128])
 
@@ -444,7 +444,7 @@ def test(flags, tokenizer, device, dataloader, model, loss_fn):
             t0=time.time()
             pred = model.forward(input_ids, attention_mask=input_mask, segment_ids=segment_ids)
             #print("dt={}".format(time.time()-t0))
-            (per_example_loss, loss) = loss_fn(pred, y)
+            (per_example_loss, loss) = loss_fn(pred, y, input_mask)
             test_loss += loss.item()
             #print("pred.shape={} y.shape={}".format(pred.shape, y.shape))
             # pred.shape=torch.Size([32, 128, 7]) y.shape=torch.Size([32, 1, 128])

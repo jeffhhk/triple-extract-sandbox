@@ -22,6 +22,11 @@ bioc==1.3.7
 torch==1.11.0
 transformers==4.18.0
 
+# for https://github.com/huggingface/transformers/blob/main/examples/pytorch/token-classification/run_ner.py
+datasets==2.2.1
+accelerate==0.7.1
+seqeval==1.2.2
+
 # for our code
 csample==0.6.2
 joblib==1.1.0

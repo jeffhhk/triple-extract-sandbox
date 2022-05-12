@@ -1,0 +1,7 @@
+bluebert/data/**
+BLUE_Benchmark/data/**
+**/.git/**
+*.pyc
+adhoc/**
+.python-version
+derived_data/**

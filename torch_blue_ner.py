@@ -4,6 +4,7 @@ import pickle
 import time
 from transformers import BertConfig, AutoModel
 from transformers import AutoTokenizer
+from transformers import AutoConfig, AutoModelForTokenClassification
 from huggingface_hub import hf_hub_url
 import torch.optim
 from torch import nn
@@ -320,12 +321,33 @@ def eval_fn(pred,y):
         return eq
 
 class NerModel(nn.Module):
-    def __init__(self, url_model, device, is_training, batch_size, num_classes) -> None:
+    def __init__(self, huggingface_repo_name, device, is_training, batch_size, num_classes) -> None:
         super().__init__()
+        self.huggingface_repo_name = huggingface_repo_name
         self.is_training = is_training
         self.batch_size = batch_size
-        self.bert_config = BertConfig.from_pretrained(url_model)
-        self.model0 = AutoModel.from_config(self.bert_config)
+        url_model = url_model=hf_hub_url(huggingface_repo_name, FILENAME)
+        cache_dir=None
+        model_revision="main"
+        #num_labels=6
+        task_name="ner"
+        self.bert_config = AutoConfig.from_pretrained(
+            self.huggingface_repo_name,
+            num_labels=num_classes,
+            finetuning_task=task_name,
+            cache_dir=cache_dir,
+            revision=model_revision,
+            use_auth_token=None
+        )
+        print(self.bert_config)
+        self.model0 = AutoModelForTokenClassification.from_pretrained(
+            self.huggingface_repo_name,
+            from_tf=False,
+            config=self.bert_config,
+            cache_dir=cache_dir,
+            revision=model_revision,
+            use_auth_token=None
+        )
         self.model0.to(device)
 
         iLastEncoder=-5
@@ -477,10 +499,8 @@ def run_main(flags):
     processor = BC5CDRProcessor(tokenizer)
     label_list = processor.get_labels()
 
-    url_model=hf_hub_url(flags.huggingface_repo_name, FILENAME)
-
     batch_size = flags.train_batch_size if flags.do_train else flags.eval_batch_size
-    nermodel = NerModel(url_model, device, flags.do_train, batch_size, len(label_list))
+    nermodel = NerModel(flags.huggingface_repo_name, device, flags.do_train, batch_size, len(label_list))
     loss_fn=create_loss_fn(len(label_list))
 
     optimizer = create_optimizer(nermodel, flags.learning_rate)

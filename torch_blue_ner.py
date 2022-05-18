@@ -355,7 +355,10 @@ class NerModel(nn.Module):
 
     def forward(self, input_ids, attention_mask=None, segment_ids=None):
         token_type_ids = None
-        self.model0(input_ids, attention_mask, token_type_ids , segment_ids)
+        self.model0.forward(
+            input_ids=input_ids,
+            attention_mask=attention_mask,
+            token_type_ids=segment_ids)
         x = self.encoder_out
         if self.is_training:
             x = self.dropout(x)

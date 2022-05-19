@@ -351,9 +351,12 @@ class NerModel(nn.Module):
         self.model0.to(device)
 
         iLastEncoder=-5
-        self.encoder = list(self.model0.modules())[iLastEncoder]
+        ms = list(self.model0.named_modules())
+        (nameLayer, self.encoder) = ms[iLastEncoder]
+        (nameLayerNext, _) = ms[iLastEncoder+1]
+        print("NerModel: Registering hook with layer {} before {}".format(nameLayer, nameLayerNext))
         self.encoder_parameters = [p
-                                   for m in list(self.model0.modules())[0:iLastEncoder+1]
+                                   for (_,m) in ms[0:iLastEncoder+1]
                                    for p in m.parameters()]
 
         self.encoder_out = None

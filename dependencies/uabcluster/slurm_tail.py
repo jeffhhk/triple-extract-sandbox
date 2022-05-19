@@ -3,6 +3,7 @@ import sys
 import os
 import fcntl
 import subprocess
+import signal
 
 def isRunning(jobid):
     # capture_output=True only created in 3.7 (documentation lies):
@@ -16,6 +17,18 @@ def isRunning(jobid):
 
 jobid=int(sys.argv[1])
 fn=sys.argv[2]
+
+def handler(signum, frame):
+    print("Ctrl-c was pressed. Kill slurm job? y/n ", flush=True)
+    res = input("")
+    if res.lower().__contains__('y'):
+        res = subprocess.run(["scancel", str(jobid)], stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='UTF-8')
+        print("scancel res={}".format(res))
+        exit(0)
+    else:
+        print("allowing job {} to continue unattended".format(jobid), flush=True)
+        exit(0)
+signal.signal(signal.SIGINT, handler)
 
 file = open(fn)
 fcntl.fcntl(file, fcntl.F_SETFL, os.O_RDONLY|os.O_NONBLOCK)

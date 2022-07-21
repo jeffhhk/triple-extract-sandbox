@@ -19,7 +19,7 @@ flags.learning_rate=5e-5
 flags.num_train_epochs=10
 flags.data_dir=adirDataset
 flags.output_dir=adirOutput
-flags.huggingface_repo_name="bionlp/bluebert_pubmed_uncased_L-12_H-768_A-12"
+flags.huggingface_repo_name="nreimers/BERT-Small-L-4_H-512_A-8"
     # or "bionlp/bluebert_pubmed_uncased_L-24_H-1024_A-16"
 
 # To vary batch size:
